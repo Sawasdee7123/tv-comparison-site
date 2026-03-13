@@ -215,17 +215,19 @@ export default function ComparisonTable({ tvs, limit }: ComparisonTableProps) {
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={8} className="px-4 py-4 bg-gray-900">
-                <div className="flex justify-center">
-                  <button className="px-8 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white font-semibold rounded-lg hover:from-primary/90 hover:to-purple-600/90 shadow-lg transition-all duration-200 transform hover:scale-105">
-                    View All {fullFilteredSorted.length} TVs →
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tfoot>
+          {limit && (
+            <tfoot>
+              <tr>
+                <td colSpan={8} className="px-4 py-4 bg-gray-900">
+                  <div className="flex justify-center">
+                    <a href="/compare" className="px-8 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white font-semibold rounded-lg hover:from-primary/90 hover:to-purple-600/90 shadow-lg transition-all duration-200 transform hover:scale-105">
+                      View All {fullFilteredSorted.length} TVs →
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
 

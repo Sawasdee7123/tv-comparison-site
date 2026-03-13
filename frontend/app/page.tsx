@@ -79,11 +79,6 @@ export default async function Home() {
             Filter by brand, panel type, size, or price. Click column headers to sort. Price per inch is highlighted for easy comparison.
           </p>
           <ComparisonTable tvs={tvs} limit={10} />
-          <div className="text-center mt-6">
-            <Link href="/compare" className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90">
-              View All TVs
-            </Link>
-          </div>
         </div>
       </section>
 
