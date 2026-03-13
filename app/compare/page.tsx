@@ -4,15 +4,8 @@ import { fetchTVs, calculateMetrics } from '@/lib/dataUtils';
 import { TVWithMetrics } from '@/lib/types';
 
 export default async function ComparePage() {
-  let tvs: TVWithMetrics[] = [];
-  try {
-    const rawTVs = await fetchTVs();
-    tvs = calculateMetrics(rawTVs);
-  } catch (error) {
-    console.error('Failed to load TVs:', error);
-    const { loadTVData, calculateMetrics: calcMetrics } = await import('@/lib/dataUtils');
-    tvs = calcMetrics(loadTVData());
-  }
+  const rawTVs = await fetchTVs();
+  const tvs = calculateMetrics(rawTVs);
 
   return (
     <div className="min-h-screen bg-gray-900">
