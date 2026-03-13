@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Navigation, ComparisonTable, TVCard, ValueMetricsExplanation } from '@/app/components';
 import { fetchTVs, calculateMetrics } from '@/lib/dataUtils';
 import { TVWithMetrics } from '@/lib/types';
@@ -77,7 +78,12 @@ export default async function Home() {
           <p className="text-gray-400 mb-6">
             Filter by brand, panel type, size, or price. Click column headers to sort. Price per inch is highlighted for easy comparison.
           </p>
-          <ComparisonTable tvs={tvs} />
+          <ComparisonTable tvs={tvs} limit={10} />
+          <div className="text-center mt-6">
+            <Link href="/compare" className="inline-flex items-center px-6 py-3 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90">
+              View All TVs
+            </Link>
+          </div>
         </div>
       </section>
 
