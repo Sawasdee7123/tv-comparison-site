@@ -1,10 +1,20 @@
 import Link from 'next/link';
 import { Navigation, ComparisonTable, TVCard, ValueMetricsExplanation } from '@/app/components';
-import { fetchTVs, calculateMetrics } from '@/lib/dataUtils';
+import { getAllTVs } from '@/lib/supabase';
 import { TVWithMetrics } from '@/lib/types';
 
+// Disable static generation for this page - always fetch fresh data
+export const dynamic = 'force-dynamic';
+
+function calculateMetrics(tvs: { current_price: number; screen_size: number }[]): TVWithMetrics[] {
+  return tvs.map(tv => ({
+    ...tv,
+    price_per_inch: tv.current_price / tv.screen_size,
+  })) as TVWithMetrics[];
+}
+
 export default async function Home() {
-  const rawTVs = await fetchTVs();
+  const rawTVs = await getAllTVs();
   const tvs = calculateMetrics(rawTVs);
 
   // Get featured TVs - best value (lowest price per inch)
