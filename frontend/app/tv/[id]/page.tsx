@@ -6,11 +6,6 @@ import { Navigation } from '@/app/components';
 import { TV, TVWithMetrics } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
-export async function generateStaticParams() {
-  // We'll generate params on client side for now to avoid build-time dependency
-  return [];
-}
-
 export default function TVDetailPage() {
   const params = useParams();
   const tvId = params.id as string;
