@@ -29,6 +29,11 @@ export interface TV {
   dimensions_no_stand: string;
   data_source: string;
   source_url: string;
+  // Affiliate links
+  affiliate_amazon?: string;
+  affiliate_bestbuy?: string;
+  affiliate_walmart?: string;
+  affiliate_target?: string;
 }
 
 export interface TVWithMetrics extends TV {

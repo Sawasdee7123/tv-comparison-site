@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { TVWithMetrics } from '@/lib/types';
+import BuyNowButton from './BuyNowButton';
 
 interface TVCardProps {
   tv: TVWithMetrics;
@@ -60,9 +61,7 @@ export default function TVCard({ tv }: TVCardProps) {
               <span className="text-xs text-gray-400">Price per inch</span>
               <div className="text-xl font-bold text-primary-400">${tv.price_per_inch.toFixed(2)}</div>
             </div>
-            <div className="text-primary-400 group-hover:translate-x-1 transition-transform">
-              →
-            </div>
+            <BuyNowButton tv={tv} variant="small" />
           </div>
         </div>
       </div>

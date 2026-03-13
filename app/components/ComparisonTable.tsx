@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { TVWithMetrics } from '@/lib/types';
+import BuyNowButton from './BuyNowButton';
 
 interface ComparisonTableProps {
   tvs: TVWithMetrics[];
@@ -208,9 +209,7 @@ export default function ComparisonTable({ tvs, limit }: ComparisonTableProps) {
                 <td className="px-4 py-4 text-gray-300">{tv.peak_hdr_brightness} nits</td>
                 <td className="px-4 py-4 text-gray-300">{tv.smart_platform}</td>
                 <td className="px-4 py-4">
-                  <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-lg hover:from-green-500/90 hover:to-emerald-600/90 transition-all duration-200 transform hover:scale-105 shadow-md">
-                    Buy Now
-                  </button>
+                  <BuyNowButton tv={tv} variant="small" />
                 </td>
               </tr>
             ))}

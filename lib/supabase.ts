@@ -40,6 +40,11 @@ export type TV = {
   source_url: string | null;
   created_at: string;
   updated_at: string;
+  // Affiliate links
+  affiliate_amazon: string | null;
+  affiliate_bestbuy: string | null;
+  affiliate_walmart: string | null;
+  affiliate_target: string | null;
 };
 
 export async function getAllTVs(): Promise<TV[]> {

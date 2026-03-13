@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/app/components';
+import BuyNowButton from '@/app/components/BuyNowButton';
 import { TV, TVWithMetrics } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
@@ -142,10 +143,10 @@ export default function TVDetailPage() {
               </div>
             </div>
 
-            {/* Quick Stats */}
+            {/* Quick Stats & Buy Now */}
             <div className="bg-gray-900 rounded-lg p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Quick Stats</h3>
-              <div className="space-y-4">
+              <div className="space-y-4 mb-6">
                 <div>
                   <div className="text-sm text-gray-400">Price Per Inch</div>
                   <div className="text-3xl font-bold text-primary-400">${tv.price_per_inch.toFixed(2)}</div>
@@ -154,6 +155,11 @@ export default function TVDetailPage() {
                   <div className="text-sm text-gray-400">Screen Size</div>
                   <div className="text-3xl font-bold text-white">{tv.screen_size}"</div>
                 </div>
+              </div>
+              
+              {/* Buy Now Section */}
+              <div className="pt-4 border-t border-gray-700">
+                <BuyNowButton tv={tv} variant="large" />
               </div>
             </div>
           </div>
