@@ -44,7 +44,7 @@ export type TV = {
 
 export async function getAllTVs(): Promise<TV[]> {
   // If no Supabase configured, fallback to local JSON
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseKey) {
     console.warn('Supabase not configured, falling back to local JSON');
     const data = await import('../data/seed_data.json');
     return data.default.map((item: any, index: number) => ({
@@ -70,7 +70,7 @@ export async function getAllTVs(): Promise<TV[]> {
 }
 
 export async function getTVById(id: string): Promise<TV | null> {
-  if (!supabaseUrl || !supabaseAnonKey) {
+  if (!supabaseUrl || !supabaseKey) {
     console.warn('Supabase not configured, falling back to local JSON');
     const data = await import('../data/seed_data.json');
     const allTVs = data.default.map((item: any, index: number) => ({
