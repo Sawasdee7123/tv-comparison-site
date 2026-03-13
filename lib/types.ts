@@ -33,5 +33,4 @@ export interface TV {
 
 export interface TVWithMetrics extends TV {
   price_per_inch: number;
-  gaming_score: number;
 }

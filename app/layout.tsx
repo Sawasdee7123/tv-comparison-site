@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "TV Comparison Site - Find the Best Value",
-  description: "Compare TVs by price-per-inch and gaming specs. Find the best value with our comprehensive comparison tool.",
+  description: "Compare TVs by price-per-inch and key specs. Find the best value with our comprehensive comparison tool.",
 };
 
 export default function RootLayout({

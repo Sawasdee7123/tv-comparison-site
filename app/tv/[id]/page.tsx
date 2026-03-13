@@ -40,16 +40,6 @@ export default function TVDetailPage() {
           tvs.map(t => ({
             ...t,
             price_per_inch: t.current_price / t.screen_size,
-            gaming_score: (() => {
-              let score = 0;
-              const inputLag = t.input_lag_ms ?? 50;
-              score += Math.max(0, 50 - inputLag * 1.5);
-              score += Math.min(t.hdmi_2_1_ports * 10, 30);
-              if (t.supports_vrr) score += 15;
-              if (t.supports_allm) score += 10;
-              if (t.supports_4k_120hz) score += 15;
-              return Math.round(score);
-            })(),
           }));
 
         const allTVsWithMetrics = calculateMetrics(allTvs);
@@ -161,16 +151,8 @@ export default function TVDetailPage() {
                   <div className="text-3xl font-bold text-primary-400">${tv.price_per_inch.toFixed(2)}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-400">Gaming Score</div>
-                  <div className={`text-3xl font-bold ${tv.gaming_score >= 80 ? 'text-green-400' : tv.gaming_score >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
-                    {tv.gaming_score}/100
-                  </div>
-                  <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                    <div
-                      className={`h-2 rounded-full ${tv.gaming_score >= 80 ? 'bg-green-500' : tv.gaming_score >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                      style={{ width: `${Math.min(tv.gaming_score, 100)}%` }}
-                    />
-                  </div>
+                  <div className="text-sm text-gray-400">Screen Size</div>
+                  <div className="text-3xl font-bold text-white">{tv.screen_size}"</div>
                 </div>
               </div>
             </div>
@@ -202,12 +184,11 @@ export default function TVDetailPage() {
             </div>
           </div>
 
-          {/* Gaming Specs */}
+          {/* Connectivity Specs */}
           <div className="bg-gray-800 rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-bold text-white mb-4">Gaming Performance</h2>
+            <h2 className="text-xl font-bold text-white mb-4">Connectivity & Features</h2>
             <div className="grid md:grid-cols-2 gap-x-8">
               <div>
-                {renderStat('Input Lag', `${tv.input_lag_ms} ms`, tv.input_lag_ms !== undefined && tv.input_lag_ms <= 10)}
                 {renderStat('HDMI 2.1 Ports', tv.hdmi_2_1_ports, tv.hdmi_2_1_ports >= 4)}
                 {renderStat('Supports VRR', tv.supports_vrr, true)}
                 {renderStat('Supports ALLM', tv.supports_allm, true)}
@@ -215,16 +196,9 @@ export default function TVDetailPage() {
                 {renderStat('Has eARC', tv.has_earc)}
               </div>
               <div>
-                <div className="py-3 border-b border-gray-700">
-                  <div className="text-sm text-gray-400">Gaming Score Breakdown</div>
-                  <div className="text-sm text-gray-300 mt-2 space-y-1">
-                    <div>Input Lag: {Math.max(0, 50 - (tv.input_lag_ms ?? 50) * 1.5)} pts</div>
-                    <div>HDMI 2.1: {Math.min(tv.hdmi_2_1_ports * 10, 30)} pts</div>
-                    <div>VRR: {tv.supports_vrr ? '15' : '0'} pts</div>
-                    <div>ALLM: {tv.supports_allm ? '10' : '0'} pts</div>
-                    <div>4K 120Hz: {tv.supports_4k_120hz ? '15' : '0'} pts</div>
-                  </div>
-                </div>
+                {renderStat('Input Lag', `${tv.input_lag_ms} ms`, tv.input_lag_ms !== undefined && tv.input_lag_ms <= 10)}
+                {renderStat('Smart Platform', tv.smart_platform || 'None')}
+                {renderStat('WiFi Standard', tv.wifi_standard || 'None')}
               </div>
             </div>
           </div>

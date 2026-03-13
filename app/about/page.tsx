@@ -20,7 +20,7 @@ export default function AboutPage() {
               Finding the right TV is overwhelming. With dozens of brands, hundreds of models, and technical specs that don&apos;t always tell the full story, it&apos;s easy to overpay or miss out on great value.
             </p>
             <p className="text-gray-300 text-lg">
-              We cut through the noise by focusing on what matters: <strong>price per inch</strong> and <strong>gaming performance</strong>. Our tools help you compare apples to apples and make informed decisions.
+              We cut through the noise by focusing on what matters: <strong>price per inch</strong> and <strong>key specifications</strong>. Our tools help you compare apples to apples and make informed decisions.
             </p>
           </section>
 
@@ -45,22 +45,19 @@ export default function AboutPage() {
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-4">Gaming Score Explained</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">Key Features We Compare</h2>
             <p className="text-gray-300 mb-4">
-              For gamers, specs matter in a specific way. Input lag, HDMI 2.1 ports, VRR, and 120Hz support directly impact your experience.
-            </p>
-            <p className="text-gray-300 mb-4">
-              We built the <strong>Gaming Score</strong> (0-100) to weight these factors:
+              Beyond price per inch, we track the specifications that matter most for your viewing experience:
             </p>
             <ul className="list-disc pl-6 text-gray-300 space-y-2 mb-6">
-              <li><strong>Input Lag (max 50 pts):</strong> Lower is better. 0ms = 50 points, scaling down linearly.</li>
-              <li><strong>HDMI 2.1 Ports (max 30 pts):</strong> 10 points per port, up to 4 ports.</li>
-              <li><strong>VRR Support (15 pts):</strong> Variable Refresh Rate prevents tearing.</li>
-              <li><strong>ALLM Support (10 pts):</strong> Auto Low Latency Mode for game mode.</li>
-              <li><strong>4K 120Hz (15 pts):</strong> Essential for next-gen console gaming.</li>
+              <li><strong>Panel Type:</strong> OLED for perfect blacks, QLED/Mini-LED for brightness.</li>
+              <li><strong>HDR Brightness:</strong> Higher nits = better HDR performance.</li>
+              <li><strong>Refresh Rate:</strong> 120Hz+ for smoother motion.</li>
+              <li><strong>HDMI 2.1 Ports:</strong> For high-bandwidth devices and future-proofing.</li>
+              <li><strong>Smart Platform:</strong> Built-in streaming apps and voice control.</li>
             </ul>
             <p className="text-gray-300">
-              <strong>Target Score:</strong> 80+ for optimal next-gen gaming, 60-80 for good gaming, below 60 indicates significant compromises.
+              Every TV in our database includes full specifications so you can find the perfect match for your needs.
             </p>
           </section>
 

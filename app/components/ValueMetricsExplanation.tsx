@@ -5,7 +5,7 @@ export default function ValueMetricsExplanation() {
     <div className="bg-gray-800 rounded-xl shadow-lg p-6 mt-8">
       <h2 className="text-2xl font-bold text-white mb-4">Understanding Our Value Metrics</h2>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      <div className="max-w-2xl mx-auto">
         {/* Price Per Inch */}
         <div>
           <div className="flex items-center gap-2 mb-3">
@@ -24,32 +24,6 @@ export default function ValueMetricsExplanation() {
           <div className="mt-4 p-3 bg-primary-900/30 border border-primary-700 rounded-lg">
             <p className="text-primary-200 text-sm">
               💡 <strong>Pro tip:</strong> Same price per inch across sizes often indicates consistent pricing strategy from a brand. Look for outliers—they might represent great deals or overpriced models.
-            </p>
-          </div>
-        </div>
-
-        {/* Gaming Score */}
-        <div>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-3xl">🎮</span>
-            <h3 className="text-xl font-semibold text-green-400">Gaming Score</h3>
-          </div>
-          <p className="text-gray-300 mb-3">
-            The <strong>Gaming Score</strong> (0-100) combines key gaming performance metrics into a single, easy-to-compare number. Here&apos;s how it&apos;s calculated:
-          </p>
-          <div className="bg-gray-900 p-3 rounded-lg font-mono text-sm space-y-2 mb-3">
-            <div>• Input Lag: (50 - ms × 1.5) points</div>
-            <div>• HDMI 2.1 Ports: 10 points each (max 30)</div>
-            <div>• VRR Support: +15 points</div>
-            <div>• ALLM Support: +10 points</div>
-            <div>• 4K 120Hz: +15 points</div>
-          </div>
-          <p className="text-gray-300">
-            <strong>Why it matters:</strong> Gaming performance isn&apos;t just about one spec. This score weights the most important features for console and PC gaming, helping you quickly identify which TVs will deliver the best gaming experience.
-          </p>
-          <div className="mt-4 p-3 bg-green-900/30 border border-green-700 rounded-lg">
-            <p className="text-green-200 text-sm">
-              💡 <strong>Target:</strong> Aim for a Gaming Score of 80+ for next-gen console gaming (PS5/Xbox Series X). Anything below 60 may have significant limitations.
             </p>
           </div>
         </div>
