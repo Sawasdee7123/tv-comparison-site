@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Navigation, ComparisonTable, TVCard, ValueMetricsExplanation, TrustBar, QuickFilters } from '@/app/components';
+import { Navigation, ComparisonTable, TVCard, ValueMetricsExplanation, TrustBar } from '@/app/components';
+import QuickFiltersWrapper from '@/app/components/QuickFiltersWrapper';
 import { getAllTVs } from '@/lib/supabase';
 import { TVWithMetrics } from '@/lib/types';
 
@@ -73,10 +74,7 @@ export default async function Home() {
       <TrustBar tvCount={tvs.length} />
 
       {/* Quick Filters */}
-      <QuickFilters onFilterChange={(type, value) => {
-        // This will be handled client-side via URL params or state
-        console.log('Filter:', type, value);
-      }} />
+      <QuickFiltersWrapper />
 
       {/* Featured by Value */}
       <section className="py-12 px-4">
