@@ -183,7 +183,9 @@ export default function ComparisonTable({ tvs, limit }: ComparisonTableProps) {
               <SortHeader field="panel_type" label="Panel" />
               <SortHeader field="peak_hdr_brightness" label="Brightness" />
               <SortHeader field="smart_platform" label="Smart Platform" />
-              <SortHeader field="availability" label="Availability" />
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                Buy Now
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
@@ -205,10 +207,25 @@ export default function ComparisonTable({ tvs, limit }: ComparisonTableProps) {
                 <td className="px-4 py-4 text-gray-300">{tv.panel_type}</td>
                 <td className="px-4 py-4 text-gray-300">{tv.peak_hdr_brightness} nits</td>
                 <td className="px-4 py-4 text-gray-300">{tv.smart_platform}</td>
-                <td className="px-4 py-4 text-gray-300">{tv.availability}</td>
+                <td className="px-4 py-4">
+                  <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-sm font-semibold rounded-lg hover:from-green-500/90 hover:to-emerald-600/90 transition-all duration-200 transform hover:scale-105 shadow-md">
+                    Buy Now
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={8} className="px-4 py-4 bg-gray-900">
+                <div className="flex justify-center">
+                  <button className="px-8 py-3 bg-gradient-to-r from-primary-500 to-purple-600 text-white font-semibold rounded-lg hover:from-primary/90 hover:to-purple-600/90 shadow-lg transition-all duration-200 transform hover:scale-105">
+                    View All {fullFilteredSorted.length} TVs →
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
 
