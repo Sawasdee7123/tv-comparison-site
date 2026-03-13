@@ -7,7 +7,7 @@ interface ComparisonTableProps {
   tvs: TVWithMetrics[];
 }
 
-type SortField = 'current_price' | 'price_per_inch' | 'input_lag_ms' | 'peak_hdr_brightness' | 'brand' | 'screen_size';
+type SortField = 'current_price' | 'price_per_inch' | 'input_lag_ms' | 'peak_hdr_brightness' | 'brand' | 'screen_size' | 'panel_type';
 type SortDirection = 'asc' | 'desc';
 
 export default function ComparisonTable({ tvs }: ComparisonTableProps) {

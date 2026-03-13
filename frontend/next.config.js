@@ -4,7 +4,6 @@ const nextConfig = {
   output: 'standalone', // Optimized for Vercel serverless
 
   // Optimize for production
-  swcMinify: true,
   reactStrictMode: true,
   poweredByHeader: false,
 
