@@ -3,15 +3,12 @@
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/app/components';
-import { calculateMetrics } from '@/lib/dataUtils';
-import { TVWithMetrics } from '@/lib/types';
+import { TV, TVWithMetrics } from '@/lib/types';
 import { useEffect, useState } from 'react';
 
 export async function generateStaticParams() {
-  const allTVsData = calculateMetrics();
-  return allTVsData.map((tv) => ({
-    id: tv.id,
-  }));
+  // We'll generate params on client side for now to avoid build-time dependency
+  return [];
 }
 
 export default function TVDetailPage() {
@@ -19,22 +16,80 @@ export default function TVDetailPage() {
   const tvId = params.id as string;
 
   const [tv, setTV] = useState<TVWithMetrics | null>(null);
-  const [allTvs, setAllTvs] = useState<TVWithMetrics[]>([]);
+  const [similarTvs, setSimilarTvs] = useState<TVWithMetrics[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const allTVsData = calculateMetrics();
-    setAllTvs(allTVsData);
-    const foundTV = allTVsData.find(t => t.id === tvId);
-    setTV(foundTV || null);
+    async function loadData() {
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const [tvRes, allTvsRes] = await Promise.all([
+          fetch(`${baseUrl}/api/tv/${tvId}`, {
+            next: { revalidate: 3600 },
+          }),
+          fetch(`${baseUrl}/api/tvs`, {
+            next: { revalidate: 3600 },
+          }),
+        ]);
+
+        if (!tvRes.ok) {
+          throw new Error('TV not found');
+        }
+
+        const tvData: TV = await tvRes.json();
+        const allTvs: TV[] = await allTvsRes.json();
+
+        // Calculate metrics
+        const calculateMetrics = (tvs: TV[]): TVWithMetrics[] =>
+          tvs.map(t => ({
+            ...t,
+            price_per_inch: t.current_price / t.screen_size,
+            gaming_score: (() => {
+              let score = 0;
+              const inputLag = t.input_lag_ms ?? 50;
+              score += Math.max(0, 50 - inputLag * 1.5);
+              score += Math.min(t.hdmi_2_1_ports * 10, 30);
+              if (t.supports_vrr) score += 15;
+              if (t.supports_allm) score += 10;
+              if (t.supports_4k_120hz) score += 15;
+              return Math.round(score);
+            })(),
+          }));
+
+        const allTVsWithMetrics = calculateMetrics(allTvs);
+        const foundTV = allTVsWithMetrics.find(t => t.id === tvId);
+
+        setTV(foundTV || null);
+        setSimilarTvs(allTVsWithMetrics.filter(t => t.brand === tvData.brand && t.id !== tvId).slice(0, 3));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load TV');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
   }, [tvId]);
 
-  if (!tv) {
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900">
+        <Navigation />
+        <div className="max-w-7xl mx-auto py-20 px-4 text-center">
+          <div className="text-2xl font-bold text-white animate-pulse">Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !tv) {
     return (
       <div className="min-h-screen bg-gray-900">
         <Navigation />
         <div className="max-w-7xl mx-auto py-20 px-4 text-center">
           <h1 className="text-4xl font-bold text-white mb-4">TV Not Found</h1>
-          <p className="text-gray-400 mb-8">The TV you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          <p className="text-gray-400 mb-8">{error || 'The TV you\'re looking for doesn\'t exist or has been removed.'}</p>
           <Link href="/" className="inline-block bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
             Back to Comparison
           </Link>
@@ -42,10 +97,6 @@ export default function TVDetailPage() {
       </div>
     );
   }
-
-  const similarTvs = allTvs
-    .filter(t => t.brand === tv.brand && t.id !== tv.id)
-    .slice(0, 3);
 
   const renderStat = (label: string, value: string | number | boolean, highlight?: boolean) => (
     <div className="py-3 border-b border-gray-700 last:border-0">
@@ -143,15 +194,15 @@ export default function TVDetailPage() {
                 {renderStat('Resolution', tv.resolution)}
                 {renderStat('Native Refresh Rate', `${tv.native_refresh_rate} Hz`)}
                 {renderStat('Peak HDR Brightness', `${tv.peak_hdr_brightness} nits`, true)}
-                {renderStat('Local Dimming Zones', tv.local_dimming_zones === 0 ? 'N/A (OLED)' : tv.local_dimming_zones)}
+                {renderStat('Local Dimming Zones', tv.local_dimming_zones === 0 ? 'N/A (OLED)' : tv.local_dimming_zones?.toString() || 'N/A')}
               </div>
               <div>
                 {renderStat('Color Gamut (DCI-P3)', `${tv.color_gamut_dci_p3}%`, true)}
-                {renderStat('HDR Formats', tv.hdr_formats)}
-                {renderStat('Smart Platform', tv.smart_platform)}
-                {renderStat('WiFi Standard', tv.wifi_standard)}
+                {renderStat('HDR Formats', tv.hdr_formats || 'None')}
+                {renderStat('Smart Platform', tv.smart_platform || 'None')}
+                {renderStat('WiFi Standard', tv.wifi_standard || 'None')}
                 {renderStat('Weight', `${tv.weight_kg} kg`)}
-                {renderStat('VESA Pattern', tv.vesa_pattern)}
+                {renderStat('VESA Pattern', tv.vesa_pattern || 'None')}
               </div>
             </div>
           </div>
@@ -161,7 +212,7 @@ export default function TVDetailPage() {
             <h2 className="text-xl font-bold text-white mb-4">Gaming Performance</h2>
             <div className="grid md:grid-cols-2 gap-x-8">
               <div>
-                {renderStat('Input Lag', `${tv.input_lag_ms} ms`, tv.input_lag_ms <= 10)}
+                {renderStat('Input Lag', `${tv.input_lag_ms} ms`, tv.input_lag_ms !== undefined && tv.input_lag_ms <= 10)}
                 {renderStat('HDMI 2.1 Ports', tv.hdmi_2_1_ports, tv.hdmi_2_1_ports >= 4)}
                 {renderStat('Supports VRR', tv.supports_vrr, true)}
                 {renderStat('Supports ALLM', tv.supports_allm, true)}
@@ -172,7 +223,7 @@ export default function TVDetailPage() {
                 <div className="py-3 border-b border-gray-700">
                   <div className="text-sm text-gray-400">Gaming Score Breakdown</div>
                   <div className="text-sm text-gray-300 mt-2 space-y-1">
-                    <div>Input Lag: {Math.max(0, 50 - tv.input_lag_ms * 1.5)} pts</div>
+                    <div>Input Lag: {Math.max(0, 50 - (tv.input_lag_ms ?? 50) * 1.5)} pts</div>
                     <div>HDMI 2.1: {Math.min(tv.hdmi_2_1_ports * 10, 30)} pts</div>
                     <div>VRR: {tv.supports_vrr ? '15' : '0'} pts</div>
                     <div>ALLM: {tv.supports_allm ? '10' : '0'} pts</div>
@@ -190,20 +241,22 @@ export default function TVDetailPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <h3 className="text-md font-semibold text-gray-300 mb-3">Dimensions</h3>
-              {renderStat('With Stand', tv.dimensions_stand)}
-              {renderStat('Without Stand', tv.dimensions_no_stand)}
+              {renderStat('With Stand', tv.dimensions_stand || 'N/A')}
+              {renderStat('Without Stand', tv.dimensions_no_stand || 'N/A')}
             </div>
             <div>
               <h3 className="text-md font-semibold text-gray-300 mb-3">Data Source</h3>
               {renderStat('Source', tv.data_source)}
-              <a
-                href={tv.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-400 hover:text-primary-300 text-sm mt-2 inline-block"
-              >
-                View original review →
-              </a>
+              {tv.source_url && (
+                <a
+                  href={tv.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-400 hover:text-primary-300 text-sm mt-2 inline-block"
+                >
+                  View original review →
+                </a>
+              )}
             </div>
           </div>
         </div>

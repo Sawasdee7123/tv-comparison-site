@@ -1,10 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
+  // Vercel deployment configuration
+  output: 'standalone', // Optimized for Vercel serverless
+
+  // Optimize for production
+  swcMinify: true,
+  reactStrictMode: true,
+  poweredByHeader: false,
+
+  // Images
   images: {
-    unoptimized: true,
+    unoptimized: true, // Use when not using image optimization service
   },
+
+  // Enable experimental features if needed
+  // experimental: {
+  //   serverComponentsExternalPackages: ['@supabase/supabase-js'],
+  // },
 }
 
 module.exports = nextConfig

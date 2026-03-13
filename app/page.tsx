@@ -1,9 +1,22 @@
 import { Navigation, ComparisonTable, TVCard, ValueMetricsExplanation } from '@/app/components';
-import { calculateMetrics } from '@/lib/dataUtils';
+import { fetchTVs, calculateMetrics } from '@/lib/dataUtils';
 import { TVWithMetrics } from '@/lib/types';
 
-export default function Home() {
-  const tvs = calculateMetrics();
+export default async function Home() {
+  let tvs: TVWithMetrics[] = [];
+  let tvsLoaded = false;
+
+  try {
+    const rawTVs = await fetchTVs();
+    tvs = calculateMetrics(rawTVs);
+    tvsLoaded = true;
+  } catch (error) {
+    console.error('Failed to load TVs:', error);
+    // Fallback to local JSON if API fails
+    const { loadTVData, calculateMetrics: calcMetrics } = await import('@/lib/dataUtils');
+    tvs = calcMetrics(loadTVData());
+    tvsLoaded = true;
+  }
 
   // Get featured TVs - best value (lowest price per inch) and best gaming (highest gaming score)
   const featuredByValue = [...tvs].sort((a, b) => a.price_per_inch - b.price_per_inch).slice(0, 3);

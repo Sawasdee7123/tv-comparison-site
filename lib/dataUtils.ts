@@ -9,6 +9,25 @@ export function loadTVData(): TV[] {
   }));
 }
 
+export async function fetchTVs(): Promise<TV[]> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/tvs`, {
+      next: { revalidate: 3600 }, // Revalidate every hour
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch TVs: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching TVs from API, falling back to local JSON:', error);
+    // Fallback to local JSON
+    return loadTVData();
+  }
+}
+
 export function calculateMetrics(tvs: TV[]): TVWithMetrics[] {
   return tvs.map(tv => ({
     ...tv,
@@ -22,7 +41,8 @@ function calculateGamingScore(tv: TV): number {
 
   // Input lag component (lower is better, so we invert)
   // 0ms = 50 points, 50ms = 0 points
-  score += Math.max(0, 50 - tv.input_lag_ms * 1.5);
+  const inputLag = tv.input_lag_ms ?? 50;
+  score += Math.max(0, 50 - inputLag * 1.5);
 
   // HDMI 2.1 ports (each worth 10 points, up to 30)
   score += Math.min(tv.hdmi_2_1_ports * 10, 30);
