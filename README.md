@@ -1,260 +1,290 @@
-# TV Comparison Site
+# TV Comparison Site - Project Guide
 
-A modern, performant TV comparison website built with Next.js 15, TypeScript, Tailwind CSS, and Supabase.
+**⚠️ IMPORTANT: All spawned agents MUST read this README first before working on this project.**
 
-## Features
+---
 
-- Compare TVs by price-per-inch, gaming performance, and key specs
-- Filter by brand, panel type, size, and price
-- Detailed TV pages with comprehensive specifications
-- Gaming score calculation based on input lag, HDMI 2.1 ports, VRR, ALLM, and 4K 120Hz support
-- Responsive design with dark theme
-- Static generation for fast loads
-- API routes for dynamic data fetching
-- Easy data management via Supabase
+## Project Overview
 
-## Tech Stack
+A production-ready TV comparison website that helps users find the best value TVs using price-per-inch metrics. Built with Next.js 15, TypeScript, Tailwind CSS, and Supabase.
 
-- **Frontend**: Next.js 15 (App Router), React 18, TypeScript
-- **Styling**: Tailwind CSS
-- **Backend**: Supabase (PostgreSQL)
-- **Deployment**: Vercel
+**Live Site:** https://frontend-ten-swart-37.vercel.app  
+**Status:** Active Development  
+**Last Updated:** March 15, 2026
+
+---
+
+## Quick Reference
+
+| Resource | URL/Location | Notes |
+|----------|--------------|-------|
+| **Live Site** | https://frontend-ten-swart-37.vercel.app | Production deployment |
+| **GitHub Repo** | https://github.com/Sawasdee7123/tv-comparison-site | Source code |
+| **Supabase Project** | https://supabase.com/dashboard/project/sxzmhlvrpfmothfjrqay | Database admin |
+| **Vercel Dashboard** | https://vercel.com/marcs-projects-c6a21ede/tv-comparison-site | Deployments |
+| **Frontend Code** | `./frontend/` | Next.js application |
+| **Database Schema** | `./database/schema.sql` | PostgreSQL schema |
+
+---
 
 ## Project Structure
 
 ```
-frontend/
-├── app/
-│   ├── api/
-│   │   ├── tvs/route.ts      # GET all TVs (with filtering)
-│   │   └── tv/[id]/route.ts  # GET single TV by ID
-│   ├── components/           # Reusable UI components
-│   ├── tv/[id]/page.tsx     # TV detail page (client component)
-│   ├── page.tsx             # Homepage (server component)
-│   └── layout.tsx
-├── lib/
-│   ├── supabase.ts          # Supabase client and data fetching functions
-│   ├── dataUtils.ts         # Data utilities and metric calculations
-│   └── types.ts             # TypeScript interfaces
-├── data/
-│   └── seed_data.json       # Initial TV data (32 TVs from RTINGS.com)
-├── supabase/
-│   └── schema.sql           # Database schema
-└── public/                  # Static assets (if any)
+comparison-site-tv/
+├── frontend/                 # Next.js application
+│   ├── app/                  # App Router (pages, components)
+│   ├── lib/                  # Utilities, types, Supabase client
+│   ├── data/                 # Seed data (deprecated - use Supabase)
+│   └── supabase/             # Database schema
+├── database/
+│   ├── schema.sql            # Full database schema
+│   └── migrations/           # Migration scripts
+├── reference/                # Documentation, decisions
+├── scripts/                  # Utility scripts
+├── DEPLOYMENT.md             # Deployment guide
+└── README.md                 # This file
 ```
 
-## Setup Instructions
+---
 
-### 1. Prerequisites
+## Supabase Database Access
 
-- Node.js 18+ installed
-- Git installed
-- Supabase account (free tier)
-- GitHub account
-- Vercel account (free)
+### Project Details
+- **Project Name:** tv-comparison-site
+- **Project ID:** `sxzmhlvrpfmothfjrqay`
+- **Region:** ap-southeast-1 (Singapore)
+- **Status:** ACTIVE_HEALTHY
 
-### 2. Create GitHub Repository
+### Access Methods
 
-**Manual steps** (since automated creation requires authentication):
+#### 1. Management API (Account-wide)
+**Use for:** Schema changes, migrations, admin operations
 
-1. Go to https://github.com/new
-2. Repository name: `comparison-site-tv`
-3. Choose Public (or Private)
-4. **DO NOT** initialize with README, .gitignore, or license (we already have these)
-5. Click "Create repository"
-6. Follow instructions to push an existing repository:
+```powershell
+$env:SUPABASE_PAT = [System.Environment]::GetEnvironmentVariable("SUPABASE_PAT", "User")
+$headers = @{ Authorization = "Bearer $env:SUPABASE_PAT"; "Content-Type" = "application/json" }
 
-```bash
-cd frontend
-git remote add origin https://github.com/your-username/comparison-site-tv.git
-git branch -M main
-git push -u origin main
+# Run SQL query
+$body = @{ query = "SELECT * FROM tvs LIMIT 5" } | ConvertTo-Json
+Invoke-RestMethod -Uri "https://api.supabase.com/v1/projects/sxzmhlvrpfmothfjrqay/database/query" -Headers $headers -Method POST -Body $body
 ```
 
-### 3. Set Up Supabase
+#### 2. Direct Database Access (Service Role)
+**Use for:** Data queries, updates (from server-side code)
 
-1. Sign up at https://supabase.com (free tier)
-2. Create a new project:
-   - Name: `tv-comparison-site`
-   - Database Password: (choose a strong password)
-   - Region: Choose closest to your audience
-   - Plan: Free tier
+```typescript
+// lib/supabase.ts
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+)
+```
 
-3. Run database schema:
-   - Go to your project's SQL Editor
-   - Click "New Query"
-   - Copy and paste contents of `frontend/supabase/schema.sql`
-   - Click "Run" to create the `tvs` table
+#### 3. Web Dashboard
+**URL:** https://supabase.com/dashboard/project/sxzmhlvrpfmothfjrqay
 
-4. Import seed data (option A: via SQL):
-   - In SQL Editor, create a new query
-   - Use the following to insert data from JSON (you'll need to format the JSON as SQL inserts):
-   ```sql
-   -- For each TV in seed_data.json, create an INSERT statement
-   -- OR use the Supabase Table Editor to manually add rows
+Use for: Manual data editing, SQL Editor, Table view, Logs
+
+### Database Schema
+
+**Main Table:** `tvs` (32 columns)
+
+Key columns:
+- `id` (UUID) - Primary key
+- `brand`, `model`, `series` - TV identification
+- `screen_size`, `panel_type`, `resolution` - Display specs
+- `current_price`, `msrp` - Pricing
+- `affiliate_amazon`, `affiliate_bestbuy`, `affiliate_walmart`, `affiliate_target` - Affiliate links
+- `data_source`, `source_url` - Attribution
+- `created_at`, `updated_at` - Timestamps
+
+**Indexes:**
+- `idx_tvs_brand`, `idx_tvs_screen_size`, `idx_tvs_panel_type`
+- `idx_tvs_current_price`, `idx_tvs_availability`
+- Composite indexes for common queries
+
+---
+
+## GitHub Repository
+
+- **Owner:** Sawasdee7123
+- **Repo:** tv-comparison-site
+- **Default Branch:** main
+- **URL:** https://github.com/Sawasdee7123/tv-comparison-site
+
+### Key Branches
+- `main` - Production code
+
+### Recent Commits
+- `15a6451` - Fix: wrap QuickFilters in client component wrapper
+- `322dcf7` - Add: affiliate link support for TVs
+- `c8709f1` - UI/UX: Phase 1 improvements
+- `42526ad` - Fix: use dynamic rendering
+- `23783ab` - Remove: local JSON fallback
+
+---
+
+## Vercel Deployment
+
+- **Project Name:** tv-comparison-site
+- **Project ID:** `prj_VUTMUeCFq8D5aBb3XSWsJG0ZujRX`
+- **Framework:** Next.js
+- **Node Version:** 24.x
+- **Region:** iad1 (US East)
+
+### Deployment URLs
+- **Production:** https://frontend-ten-swart-37.vercel.app
+- **Latest:** https://tv-comparison-site-git-main-marcs-projects-c6a21ede.vercel.app
+
+### Environment Variables (Vercel)
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_BASE_URL`
+
+---
+
+## Skills & Tools Reference
+
+### Supabase Skill
+**Location:** `~/.openclaw/shared/skills/elon/supabase-workspace/SKILL.md`
+
+**Key capabilities:**
+- Account-wide management via PAT
+- SQL query execution
+- Project management
+- Database administration
+
+**Environment Variables needed:**
+- `SUPABASE_PAT` - Personal Access Token (account-wide)
+- `SUPABASE_SERVICE_ROLE_KEY` - Project-specific admin key
+
+### Vercel Skill
+**Location:** `~/.openclaw/shared/skills/elon/vercel-workspace/SKILL.md`
+
+**Key capabilities:**
+- Deploy project
+- List deployments
+- Check deployment status
+- Update project settings
+
+**Environment Variables needed:**
+- `VERCEL_TOKEN` - API token
+
+---
+
+## Current Features
+
+### Implemented
+- ✅ 32 TVs in database (Supabase)
+- ✅ Price-per-inch metric calculation
+- ✅ Responsive comparison table with sorting/filtering
+- ✅ TV detail pages
+- ✅ Mobile navigation
+- ✅ Quick filters (Budget, Size, Panel, Features)
+- ✅ Trust bar with animated stats
+- ✅ Affiliate link support (Amazon, Best Buy, Walmart, Target)
+- ✅ Buy Now buttons with retailer selection
+- ✅ Dark theme UI
+
+### Affiliate Links Status
+| TV | Amazon | Best Buy | Walmart | Target |
+|----|--------|----------|---------|--------|
+| Samsung QN85QN90FAFXZA | ✅ | ⬜ | ⬜ | ⬜ |
+| All others (31) | ⬜ | ⬜ | ⬜ | ⬜ |
+
+---
+
+## Agent Instructions
+
+**When spawning an agent to work on this project:**
+
+1. **ALWAYS include in the task:**
+   ```
+   Read the README at C:\Users\Skynet\.openclaw\shared\projects\comparison-site-tv\README.md first.
+   This contains critical project context, credentials, and access information.
    ```
 
-   **Option B (Recommended)**: Use the Supabase UI:
-   - Go to Table Editor
-   - Click "Insert" and add each TV manually or via CSV import
-   - Ensure `id` is left empty (auto-generated)
-   - Map all fields from the JSON
+2. **For database work:**
+   - Use Management API with `SUPABASE_PAT` for schema changes
+   - Use Service Role Key for data operations
+   - Project ID: `sxzmhlvrpfmothfjrqay`
 
-5. Get your credentials:
-   - Go to Project Settings → API
-   - Copy `URL` and `anon public` key
-   - These are your Supabase credentials
+3. **For deployment:**
+   - Git push triggers automatic Vercel deployment
+   - Or use Vercel skill with `VERCEL_TOKEN`
 
-### 4. Configure Environment Variables
+4. **For frontend changes:**
+   - Code is in `./frontend/`
+   - Uses Next.js App Router
+   - Components in `./frontend/app/components/`
 
-1. In the `frontend` directory, copy `.env.local.example` to `.env.local`
-2. Fill in your Supabase credentials:
+---
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
-NEXT_PUBLIC_BASE_URL=http://localhost:3000  # For local dev; change for prod
+## Common Tasks
+
+### Add Affiliate Link to TV
+```sql
+UPDATE tvs 
+SET affiliate_amazon = 'https://amzn.to/XXXXXXX'
+WHERE brand = 'BrandName' AND model = 'ModelName';
 ```
 
-3. For production (Vercel), add these same environment variables in Vercel project settings.
-
-### 5. Expand TV Data (Manual Curation)
-
-The current seed data has 32 TVs. The project goal is 50-60 TVs.
-
-**How to add more TVs:**
-
-1. Research TVs on RTINGS.com or other reputable sources
-2. Add new TV objects to `data/seed_data.json` following the existing structure
-3. Maintain data source attribution in `data_source` and `source_url` fields
-4. Test locally with `npm run dev`
-
-**Important:** Keep the JSON format valid. Each TV must have all required fields.
-
-### 6. Install Dependencies
-
-```bash
+### Deploy Latest Changes
+```powershell
 cd frontend
-npm install
-```
-
-### 7. Run Development Server
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3000 in your browser.
-
-### 8. Build for Production
-
-```bash
-npm run build
-npm start
-```
-
-This creates an optimized production build.
-
-### 9. Deploy to Vercel
-
-1. Push your code to GitHub (if not already):
-```bash
-git add .
-git commit -m "Ready for deployment"
+git add -A
+git commit -m "Your message"
 git push origin main
+# Vercel auto-deploys
 ```
 
-2. Go to https://vercel.com/new
-3. Import your GitHub repository (`comparison-site-tv`)
-4. Configure:
-   - Framework Preset: Next.js
-   - Root Directory: `frontend` (if your repo has separate frontend folder)
-   - Build Command: `npm run build`
-   - Output Directory: `.next` (default)
-5. Add Environment Variables in Vercel (same as your `.env.local`):
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_BASE_URL` (set to your Vercel URL, e.g., `https://your-app.vercel.app`)
-6. Click "Deploy"
-
-Your site will be live at `https://your-app.vercel.app`.
-
-### 10. Post-Deployment
-
-- Verify API routes work:
-  - https://your-app.vercel.app/api/tvs
-  - https://your-app.vercel.app/api/tv/[id]
-- Check that TV listings and detail pages load correctly
-- Update `NEXT_PUBLIC_BASE_URL` in Vercel environment variables to your actual domain
-
-## API Reference
-
-### GET /api/tvs
-
-Returns all TVs, with optional query parameters for filtering.
-
-**Query Parameters:**
-- `brand` (string): Filter by brand (case-insensitive)
-- `minPrice` (number): Minimum current price
-- `maxPrice` (number): Maximum current price
-- `minSize` (number): Minimum screen size in inches
-- `maxSize` (number): Maximum screen size in inches
-- `panelType` (string): Filter by panel type (e.g., "OLED", "QLED")
-
-**Example:**
-```
-/api/tvs?brand=Samsung&minPrice=1000&maxSize=65
+### Check Database Status
+```sql
+SELECT 
+  brand, 
+  model, 
+  COUNT(*) as total_tvs,
+  COUNT(affiliate_amazon) as with_amazon_links
+FROM tvs 
+GROUP BY brand
+ORDER BY total_tvs DESC;
 ```
 
-### GET /api/tv/[id]
+---
 
-Returns a single TV by its UUID or string ID.
+## Troubleshooting
 
-**Example:**
-```
-/api/tv/123e4567-e89b-12d3-a456-426614174000
-```
+**Issue:** "Invalid API key" when querying Supabase  
+**Fix:** Use `SUPABASE_PAT` (Personal Access Token) not `SUPABASE_ANON_KEY` for Management API
 
-## Data Model
+**Issue:** Deployment fails with build error  
+**Fix:** Check `npm run build` locally first. Common issues: missing env vars, TypeScript errors
 
-See `lib/types.ts` for full TypeScript interface. Key fields:
+**Issue:** Buy Now buttons show "Coming Soon"  
+**Fix:** Add affiliate links to database. See "Affiliate Links Status" above.
 
-- `brand`: TV manufacturer (Samsung, LG, Sony, etc.)
-- `model`: Model number
-- `screen_size`: Diagonal inches
-- `panel_type`: OLED, QLED, LED, etc.
-- `current_price`: Current price in USD
-- `price_per_inch`: Calculated metric
-- `gaming_score`: Calculated 0-100 score based on gaming specs
-- Gaming fields: `input_lag_ms`, `hdmi_2_1_ports`, `supports_vrr`, `supports_allm`, `supports_4k_120hz`
+---
 
-## Static Data Approach
+## Project Decisions Log
 
-- **No scrapers**: Data is manually curated from RTINGS.com
-- **Manual updates**: Add TVs via Supabase Table Editor or direct SQL
-- **Attribution**: Each TV includes `data_source` and `source_url` fields
-- **Fallback**: API routes fall back to local JSON if Supabase is unavailable
+| Date | Decision | Reason |
+|------|----------|--------|
+| 2026-03-13 | Removed Gaming Score | Deprecated feature |
+| 2026-03-13 | Removed local JSON fallback | Supabase is sole source of truth |
+| 2026-03-13 | Added dynamic rendering | Fixes build-time API issues |
+| 2026-03-13 | Added affiliate link columns | Monetization |
+| 2026-03-15 | Added Phase 1 UX improvements | Better user experience |
 
-## Development Notes
+---
 
-- Server components fetch data from API routes at build/request time
-- Client-side error handling with localStorage caching possible
-- Pages are optimized with proper caching headers (1 hour revalidation)
-- Type safety enforced with TypeScript interfaces
+## Contacts
 
-## Future Enhancements
+- **Project Owner:** Marc
+- **Chief of Staff:** Bob (me)
+- **CTO:** Elon (infrastructure)
 
-- Admin interface for data management (protected by Supabase auth)
-- Price history tracking
-- Advanced filtering (HDR formats, smart platform, etc.)
-- Comparison list favorites
-- User reviews and ratings
-- Email alerts for price drops
+---
 
-## License
-
-MIT
-
-## Credits
-
-Data sourced from [RTINGS.com](https://www.rtings.com). Please attribute appropriately.
+*Last updated: March 15, 2026 by Bob*
